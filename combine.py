@@ -22,58 +22,6 @@ GMAIL_APP_PASSWORD = 'zoxv epbg ojpm zliq'  # Use app password
 # Base URL for the OpenWeatherMap API
 BASE_URL = 'http://api.openweathermap.org/data/2.5/forecast'
 
-# Function to fetch 3-day weather forecast
-def fetch_three_day_weather(city):
-    url = f"{BASE_URL}?q={city}&appid={OPENWEATHER_API_KEY}&units=metric"
-    response = requests.get(url)
-
-    if response.status_code == 200:
-        data = response.json()
-        forecast_list = data['list']
-
-        weather_report = f"3-Day Weather Forecast for {city} (Including Today):\n\n"
-        current_date = datetime.now().date()
-        day_count = 0
-        added_dates = set()
-        today_included = False
-
-        for forecast in forecast_list:
-            dt_txt = forecast['dt_txt']
-            date_time = datetime.strptime(dt_txt, '%Y-%m-%d %H:%M:%S')
-            forecast_date = date_time.date()
-
-            if not today_included and forecast_date == current_date:
-                today_included = True
-                temperature = forecast['main']['temp']
-                weather_description = forecast['weather'][0]['description']
-
-                weather_report += f"Date: {date_time.strftime('%Y-%m-%d')} (Today)\n"
-                weather_report += f"Temperature: {temperature}°C\n"
-                weather_report += f"Weather: {weather_description}\n"
-                weather_report += "-" * 30 + "\n"
-
-                added_dates.add(forecast_date)
-                day_count += 1
-                continue
-
-            if forecast_date not in added_dates and forecast_date > current_date and date_time.hour == 12:
-                temperature = forecast['main']['temp']
-                weather_description = forecast['weather'][0]['description']
-
-                weather_report += f"Date: {date_time.strftime('%Y-%m-%d')}\n"
-                weather_report += f"Temperature: {temperature}°C\n"
-                weather_report += f"Weather: {weather_description}\n"
-                weather_report += "-" * 30 + "\n"
-
-                added_dates.add(forecast_date)
-                day_count += 1
-
-            if day_count >= 3:
-                break
-
-        return weather_report
-    else:
-        return f"Error fetching data for {city}: {response.status_code}"
 
 # Function to send email
 def send_email_with_gmail(subject, body, recipient_email):
